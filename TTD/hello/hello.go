@@ -4,7 +4,7 @@ import "fmt"
 
 //main func
 func main() {
-	fmt.Println(hello("world", ""))
+	fmt.Println(Hello("world", ""))
 }
 
 const englishHelloPrefix = "hello "
@@ -14,15 +14,21 @@ const spanish = "spanish"
 const french = "french"
 
 //simple example of a unit test
-func hello(name string, lang string) string {
+func Hello(name string, lang string) string {
 	if name == "" {
 		name = "world"
 	}
-	if lang == spanish {
-		return spanishHelloPrefix + name
+	return prefix(lang) + name
+}
+
+func prefix(lang string) (prefix string) {
+	switch lang {
+	case french:
+		prefix = frenchHelloPrefix
+	case spanish:
+		prefix = spanishHelloPrefix
+	default:
+		prefix = englishHelloPrefix
 	}
-	if lang == french {
-		return frenchHelloPrefix + name
-	}
-	return englishHelloPrefix + name
+	return
 }
