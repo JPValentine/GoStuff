@@ -1,5 +1,6 @@
 package main
 
+
 func Sum(numbers []int)int{
 	sum := 0
 	for _, number := range numbers{
@@ -7,3 +8,11 @@ func Sum(numbers []int)int{
 	}//for
 	return sum
 }//sum
+
+func SumAll(numbersToSum ...[]int)([]int){
+	var sums []int
+	for _, numbers := range numbersToSum{
+		sums = append(sums,Sum(numbers))
+	}
+	return sums
+}
