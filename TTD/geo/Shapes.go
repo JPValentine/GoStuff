@@ -13,6 +13,11 @@ type Circle struct{
 	Radius float64
 }
 
+type Triangle struct{
+	Base float64
+	Height float64
+}
+
 //Interface resolution is implicit
 //if the type you pass in matches what the interface is asking for, it will compile
 type Shape interface{
@@ -21,6 +26,10 @@ type Shape interface{
 
 func Perimeter(r Rectangle) float64{
 	return 2*(r.Width+r.Height)
+}
+
+func (t Triangle) Area() float64{
+	return (t.Base*t.Height)/2
 }
 
 func (r Rectangle) Area() float64{
