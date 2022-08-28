@@ -4,7 +4,7 @@ import(
 	"testing"
 	"time"
 	"net/http"
-//	"net/http/httptest"
+	"net/http/httptest"
 )
 
 func makeDelayedServer(delay time.Duration) *httptest.Server{
@@ -15,14 +15,36 @@ func makeDelayedServer(delay time.Duration) *httptest.Server{
 }//makeDelayedServer
 
 func TestRacer(t *testing.T){
-	slowURL := "http://www.facebook.com"
-	fastURL := "http://www.google.com"
+	t.Run("race check" , func(t *testing.T){
+		slowServer := makeDelayedServer(20 * time.Millisecond)
+		fastServer := makeDelayedServer(1 * time.Millisecond)
 
-	want := fastURL
-	got := Racer(slowURL, fastURL)
+		defer slowServer.Close()
+		defer fastServer.Close()
+		
+		slowURL := slowServer.URL 
+		fastURL := fastServer.URL
 
-	if got != want{
-		t.Errorf("got %q, want %q", got, want)
-	}
+		want := fastURL
+		got,err := Racer(slowURL, fastURL)
+
+		if got != want{
+			t.Errorf("got %q, want %q", got, want)
+		}
+
+		if err != nil{
+			t.Fatalf("got an error but did not expect one")
+		}
+	})
+	t.Run("timeout check", func(t *testing.T){
+		x := makeDelayedServer(25 * time.Millisecond)
+	
+		defer x.Close()
+		
+		_, err := ConfigRacer(x.URL, x.URL, 20*time.Millisecond)
+		if err== nil{
+			t.Error("expected an error but didn't get one")
+		}
+	})
 }
 
