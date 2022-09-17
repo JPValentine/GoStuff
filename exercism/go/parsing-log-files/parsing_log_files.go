@@ -47,6 +47,19 @@ func RemoveEndOfLineText(text string) string {
 }
 
 func TagWithUserName(lines []string) []string {
-	usr := regexpMustCompile(`(?i)\b(user)\s*(\S+)`)
-	
+	usr := regexp.MustCompile(`\b(User) \s*(\S+)`)
+	rmvUser := regexp.MustCompile(`\b(User) \s*`)
+	for i,val := range lines{
+		s := usr.FindString(val)
+		u := rmvUser.ReplaceAllString(s,"")
+		if usr.MatchString(val){
+			lines[i]=TagChangeUSR(val,u) 
+		}
+	}
+	return lines
+}
+
+func TagChangeUSR(s string, name string) string{
+	s ="[USR] "+ name + " " + s
+	return s
 }
