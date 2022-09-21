@@ -33,13 +33,7 @@ func Filter(in []Record, predicate func(Record) bool) []Record {
 // the day of the record is inside the period of day and false otherwise.
 func ByDaysPeriod(p DaysPeriod) func(Record) bool {
 	return func(r Record) bool{
-		flag:=false
-		for i:=p.From;p.To+1>i;i++{
-			if i==r.Day{
-				flag=true
-			}
-		}
-		return flag
+		return p.From<=r.Day && p.To>=r.Day
 	}
 }
 
@@ -48,27 +42,19 @@ func ByDaysPeriod(p DaysPeriod) func(Record) bool {
 // and false otherwise.
 func ByCategory(c string) func(Record) bool {
 	return func(r Record) bool{
-		flag:=false
-		if r.Category==c{
-			flag=true
-		}
-                return flag
+		return r.Category == c
         }
-
 }
 
 // TotalByPeriod returns total amount of expenses for records
 // inside the period p.
 func TotalByPeriod(in []Record, p DaysPeriod) float64 {
-	total:=0.0
-	for j:=0;len(in)>j;j++{
-		for i:=p.From;p.To+1>i;i++{
-			if i==in[j].Day{
-				total+=in[j].Amount
-			}
-		}//i
-	}//j
-        return total
+	out:=0.0
+	f:=Filter(in, ByDaysPeriod(p))
+	for _,v := range f{
+		out+=v.Amount
+	}
+	return out
 }
 
 
@@ -77,22 +63,9 @@ func TotalByPeriod(in []Record, p DaysPeriod) float64 {
 // An error must be returned only if there are no records in the list that belong
 // to the given category, regardless of period of time.
 func CategoryExpenses(in []Record, p DaysPeriod, c string) (float64, error) {
-	total:=0.0
-	flag:=false
-	for x:=0;len(in)>x;x++{
-		if in[x].Category == c{ flag = true}
+	Cats:=Filter(in, ByCategory(c))
+	if len(Cats)==0{
+		return 0.0, errors.New(fmt.Sprintf("unknown category %s",c))
 	}
-        for j:=0;len(in)>j;j++{
-                for i:=p.From;p.To+1>i;i++{
-                        if i==in[j].Day && in[j].Category == c{
-                                total+=in[j].Amount
-                        }
-                }//i
-        }//j
-	if flag{
-		fmt.Println(total)
-        	return total,nil
-	}
-        return total,errors.New(fmt.Sprintf("unknown category %s",c))
-	
+	return TotalByPeriod(Cats,p),nil
 }
